@@ -1,0 +1,364 @@
+﻿@model List<Book>
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject BookStore.IRepository.IWishlistRepo _wishlistRepo
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Search Results";
+    var userId = User.Identity.IsAuthenticated ? int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) : 0;
+    var wishlist = userId != 0 ? _wishlistRepo.GetWishlistByUserId(userId) : null;
+    var bookIdsInWishlist = wishlist?.WishlistItems.Select(w => w.BookId).ToHashSet() ?? new HashSet<int>();
+
+  
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    .wishlist-wrapper {
+        display: inline-block;
+        border: none;
+        background: none;
+    }
+
+    .wishlist-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #272727;
+        color: white;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .wishlist-icon {
+        color: white;
+        vertical-align: middle;
+        line-height: 1;
+        margin-top: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .wishlist-wrapper:hover .wishlist-circle {
+        background-color: #f86d72;
+    }
+
+    .wishlist-wrapper:hover .wishlist-icon {
+        color: white;
+    }
+
+    .wishlist-wrapper.active .wishlist-circle {
+        background-color: white;
+    }
+
+    .wishlist-wrapper.active .wishlist-icon {
+        color: #f86d72;
+    }
+
+    .cart-wrapper {
+        display: inline-block;
+        border: none;
+        background: none;
+    }
+
+    .cart-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #272727;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .cart-wrapper:hover .cart-circle {
+        background-color: #f86d72;
+    }
+
+    .cart-wrapper:hover .cart-icon {
+        color: white;
+    }
+
+    .cart-wrapper.active .cart-circle {
+        background-color: white;
+    }
+
+    .cart-wrapper.active .cart-icon {
+        color: #f86d72;
+    }
+
+    .book-card:hover {
+        transform: translateY(-6px);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-card img {
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover img {
+        transform: scale(1.05);
+    }
+
+  
+    .pagination .active-fancy {
+        background-color: #f86d72 !important; 
+        color: white !important;
+        border-color: #f86d72 !important;
+       font-weight: 700;
+        transform: scale(1.1); 
+        transition: all 0.3s ease;
+    }
+
+
+    .text-site-color {
+        color: #f86d72;
+    }
+
+    :root {
+        --site-primary-color: #f86d72; 
+        --site-primary-dark: #d9534f; 
+    }
+
+    .old-price {
+        color: #aaa;
+        font-size: 0.9rem;
+        font-weight: 400;
+        text-decoration: line-through;
+        opacity: 0.7;
+        margin-right: 8px;
+    }
+
+    .new-price {
+        color: var(--site-primary-dark);
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .discount-badge {
+        background: linear-gradient(135deg, var(--site-primary-color), var(--site-primary-dark));
+        color: white;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(216, 83, 79, 0.5);
+        user-select: none;
+    }
+
+</style>
+
+<input type="hidden" name="__RequestVerificationToken" value="@Xsrf.GetAndStoreTokens(Context).RequestToken" />
+
+<div class="container py-5">
+    <div class="section-title d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-site-color fw-bold"><i class=" me-2"></i>🏷️ Books in @ViewBag.CategoryName Category</h3>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center shadow-sm rounded-3 py-4 fs-5">
+            <i class="bi bi-emoji-frown text-warning fs-3 d-block mb-2"></i>
+            No books matched your search query.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var book in Model)
+            {
+                <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100 book-card position-relative">
+                        <div class="card-img-top bg-white d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <img src="/images/@(string.IsNullOrEmpty(book.ImagePath) ? "default-book.jpg" : book.ImagePath)"
+                                 class="img-fluid"
+                                 style="max-height: 230px; max-width: 100%; object-fit: contain;" />
+                        </div>
+                        <div class="card-body text-center">
+                            <h6 class="mt-4 mb-2 fw-bold">
+                                <a asp-controller="Book" asp-action="Details" asp-route-id="@book.Id">@book.Title</a>
+                            </h6>
+                            <p class="my-2 fs-6 text-black-50">by @book.Author</p>
+                            <div class="price mb-2 fs-5 d-flex justify-content-center align-items-center gap-2">
+                                @if (book.Discount.HasValue && book.Discount.Value > 0)
+                                {
+                                    var discountedPrice = book.Price - book.Discount.Value;
+                                    var discountPercent = (int)(book.Discount.Value / book.Price * 100);
+                                    <del class="old-price">$@book.Price</del>
+                                    <span class="new-price">$@discountedPrice</span>
+                                    <span class="discount-badge">-@discountPercent%</span>
+                                }
+                                else
+                                {
+                                    <span class="new-price">$@book.Price</span>
+                                }
+                            </div>
+
+
+                            <div class="card-concern position-absolute start-0 end-0 d-flex gap-2">
+                                <button type="button" class="cart-toggle-btn cart-wrapper border-0 bg-transparent p-0" data-book-id="@book.Id">
+                                    <div class="cart-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-bag-plus cart-icon" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                </button>
+                                <button class="wishlist-toggle-btn wishlist-wrapper border-0 bg-transparent p-0 @(bookIdsInWishlist.Contains(book.Id) ? "active" : "")" data-book-id="@book.Id">
+                                    <div class="wishlist-circle d-flex align-items-center justify-content-center">
+                                        <i class="wishlist-icon bi @(bookIdsInWishlist.Contains(book.Id) ? "bi-heart-fill" : "bi-heart")" style="font-size: 1.4rem;"></i>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+       
+
+    }
+</div>
+
+
+<div class="modal fade" id="wishlistModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center border-0 shadow-lg p-4" style="border-radius: 16px;">
+            <div class="modal-body">
+                <i id="wishlistModalIcon" class="bi bi-heart-fill display-4 mb-3 text-danger"></i>
+                <p id="wishlistModalMessage" class="fs-5 fw-semibold mb-3"></p>
+                <button type="button" class="btn btn-outline-primary rounded-pill px-4" data-bs-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4 border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-body">
+                <i class="bi bi-bag-check-fill display-4 text-success mb-3"></i>
+                <p id="cartModalMessage" class="fs-5 fw-semibold mb-4">The book has been added to your cart!</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/Cart/Index" class="btn btn-success">Go to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loginWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4 border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-body">
+                <i class="bi bi-exclamation-triangle-fill display-4 text-warning mb-3"></i>
+                <p class="fs-5 fw-semibold mb-4">You need to log in first to complete this action.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="goToLoginBtn" type="button" class="btn btn-warning">Log In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const wishlistModal = new bootstrap.Modal(document.getElementById('wishlistModal'));
+            const wishlistMessage = document.getElementById('wishlistModalMessage');
+            const wishlistIcon = document.getElementById('wishlistModalIcon');
+
+            const loginWarningModalEl = document.getElementById('loginWarningModal');
+            const loginWarningModal = new bootstrap.Modal(loginWarningModalEl);
+            const goToLoginBtn = document.getElementById('goToLoginBtn');
+
+            goToLoginBtn.addEventListener('click', function () {
+                window.location.href = "/Account/Login";
+            });
+
+            const isAuthenticated = @((ViewBag.IsAuthenticated.ToString().ToLower()));
+
+            document.querySelectorAll(".wishlist-toggle-btn").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    if (!isAuthenticated) {
+                        loginWarningModal.show();
+                        return;
+                    }
+
+                    const bookId = this.getAttribute("data-book-id");
+
+                    fetch('/WishlistItem/Toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(bookId)
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            const wrapper = this.closest(".wishlist-wrapper");
+                            const icon = wrapper.querySelector(".wishlist-icon");
+
+                            if (data.status === "added") {
+                                icon.classList.remove("bi-heart");
+                                icon.classList.add("bi-heart-fill");
+                                wrapper.classList.add("active");
+                                wishlistMessage.textContent = "Book added to wishlist";
+                                wishlistIcon.className = "bi bi-heart-fill display-4 mb-3 text-danger";
+                            } else if (data.status === "removed") {
+                                icon.classList.remove("bi-heart-fill");
+                                icon.classList.add("bi-heart");
+                                wrapper.classList.remove("active");
+                                wishlistMessage.textContent = "Book removed from wishlist";
+                                wishlistIcon.className = "bi bi-heart display-4 mb-3 text-secondary";
+                            }
+
+                            wishlistModal.show();
+                        });
+                });
+            });
+
+            const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+
+            document.querySelectorAll(".cart-toggle-btn").forEach(button => {
+                button.addEventListener("click", function () {
+
+                    if (!isAuthenticated) {
+                        loginWarningModal.show();
+                        return;
+                    }
+
+                    const bookId = this.getAttribute("data-book-id");
+
+                    fetch('/CartItem/Add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(bookId)
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                cartModal.show();
+                            } else {
+                                alert("Error adding to cart");
+                            }
+                        });
+                });
+            });
+        });
+
+
+    </script>
+}
+

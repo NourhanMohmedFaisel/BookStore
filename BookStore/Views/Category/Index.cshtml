@@ -1,0 +1,79 @@
+﻿@model List<Category>
+
+@{
+    ViewData["Title"] = "All Categories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-pink fw-bold"><i class="bi bi-tags-fill me-2"></i> Category Management</h2>
+        <a asp-action="Add" class="btn btn-pink rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> Add New Category
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No categories found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover text-center shadow-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Books Count</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var category = Model[i];
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>
+                                <img src="~/images/@(category.ImagePath ?? "default-book.jpg")" alt="Image" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                            </td>
+                            <td>@category.Name</td>
+                            <td>@(category.Books?.Count ?? 0)</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-outline-warning btn-sm me-2 rounded-pill">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a asp-action="ConfirmDelete" asp-route-id="@category.Id" class="btn btn-outline-danger btn-sm rounded-pill">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .text-pink {
+        color: #fd6d7b;
+    }
+
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff4e61;
+        }
+
+    .table td, .table th {
+        vertical-align: middle !important;
+    }
+
+</style>

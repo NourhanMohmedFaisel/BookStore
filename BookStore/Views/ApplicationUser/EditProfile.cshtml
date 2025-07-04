@@ -1,0 +1,121 @@
+﻿@model UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<style>
+    .edit-form-card {
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        padding: 40px 30px;
+    }
+
+    .edit-btn {
+        background: var(--site-primary-color, #f86d72);
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 50px;
+        color: #fff;
+        transition: background 0.3s ease;
+    }
+
+        .edit-btn:hover {
+            background: var(--site-primary-dark, #d9534f);
+        }
+
+    .cancel-btn {
+        background: #6c757d;
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 50px;
+        color: #fff;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .cancel-btn:hover {
+            background: #5a6268;
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding-left: 40px;
+        position: relative;
+        box-shadow: none;
+        transition: 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #f86d72;
+            box-shadow: 0 0 0 0.2rem rgba(248, 109, 114, 0.25);
+        }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+    }
+
+    .form-group-icon {
+        position: relative;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="edit-form-card">
+                <h3 class="text-center fw-bold mb-4 text-site-color">Edit Your Profile</h3>
+
+                <form asp-action="EditProfile" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-4 form-group-icon">
+                        <label asp-for="Name" class="form-label"></label>
+                        <i class="bi bi-person-fill input-icon"></i>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4 form-group-icon">
+                        <label asp-for="Email" class="form-label"></label>
+                        <i class="bi bi-envelope-fill input-icon"></i>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4 form-group-icon">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <i class="bi bi-telephone-fill input-icon"></i>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                   
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Profile" class="cancel-btn">Cancel</a>
+                        <button type="submit" class="edit-btn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

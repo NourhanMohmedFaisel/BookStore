@@ -1,0 +1,77 @@
+﻿@model List<CartItem>
+
+@{
+    ViewData["Title"] = "Checkout";
+    double total = 0;
+}
+<style>
+    .text-site-color {
+        color: #f86d72 !important; 
+    }
+
+</style>
+<div class="container py-5">
+    <h2 class="mb-4 text-center text-site-color">
+        <i class="bi bi-receipt me-2"></i>Order Summary
+    </h2>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <table class="table table-bordered table-hover align-middle text-center shadow-sm rounded">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Book</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var book = item.Book;
+                        double originalPrice = book.Price;
+                        double discount = book.Discount ?? 0;
+                        double discountedPrice = originalPrice - discount;
+                        double subtotal = discountedPrice * item.Quantity;
+                        total += subtotal;
+
+                        <tr>
+                            <td class="fw-semibold">@book.Title</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @if (discount > 0)
+                                {
+                                    <span class="text-muted text-decoration-line-through text-site-color me-1">
+                                        $@originalPrice.ToString("0.00")
+                                    </span>
+                                    <span class="text-success fw-bold">
+                                        $@discountedPrice.ToString("0.00")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>$@originalPrice.ToString("0.00")</span>
+                                }
+                            </td>
+                            <td class="fw-bold">$@subtotal.ToString("0.00")</td>
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+
+            <div class="bg-light p-3 rounded text-end mb-4 shadow-sm">
+                <h5>Total: <span class="text-success fw-bold">$@total</span></h5>
+            </div>
+
+
+            <form asp-action="PlaceOrder" method="post" class="text-end">
+                <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                    <i class="bi bi-check-circle-fill me-2"></i>Confirm & Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

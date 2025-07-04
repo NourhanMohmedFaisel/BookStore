@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <h2 class="mb-4">📊 Dashboard Overview</h2>
+    <div class="row g-4">
+
+      
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #4e73df, #224abe); color: white;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase">Books</h6>
+                        <h3 class="fw-bold">@ViewBag.BookCount</h3>
+                    </div>
+                    <i class="bi bi-book fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #1cc88a, #19926b); color: white;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase">Orders</h6>
+                        <h3 class="fw-bold">@ViewBag.OrderCount</h3>
+                    </div>
+                    <i class="bi bi-receipt-cutoff fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f6c23e, #d4a019); color: white;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase">Revenue</h6>
+                        <h3 class="fw-bold">$@ViewBag.TotalRevenue</h3>
+                    </div>
+                    <i class="bi bi-cash-coin fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+       
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #858796, #5a5c69); color: white;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase">Users</h6>
+                        <h3 class="fw-bold">@ViewBag.UserCount</h3>
+                    </div>
+                    <i class="bi bi-people fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

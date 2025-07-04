@@ -1,0 +1,34 @@
+﻿@model Order
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center">💳 Checkout</h2>
+
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-3">Order Summary</h4>
+        <p><strong>Order ID:</strong> @Model.Id</p>
+        <p><strong>Total Amount:</strong> $@Model.TotalAmount</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+
+        <hr />
+
+        <form asp-action="Process" method="post">
+            <input type="hidden" name="orderId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="paymentMethod" class="form-label">Select Payment Method</label>
+                <select name="paymentMethod" id="paymentMethod" class="form-select" required>
+                    <option value="">-- Choose --</option>
+                    <option value="CreditCard">Credit Card</option>
+                    <option value="PayPal">PayPal</option>
+                    <option value="CashOnDelivery">Cash on Delivery</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Pay Now</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,123 @@
+﻿
+@model BookViewModel
+
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+<style>
+    .form-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 700px;
+    }
+
+    .form-title {
+        color: #fd6d7b;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff4e61;
+            color: white;
+        }
+
+    .btn-outline-secondary:hover {
+        background-color: #e2e6ea;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #fd6d7b;
+        box-shadow: 0 0 0 0.25rem rgba(253, 109, 123, 0.25);
+    }
+
+    label {
+        font-weight: 500;
+    }
+
+    .form-control-file {
+        margin-top: 5px;
+    }
+</style>
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="form-container">
+            <h2 class="form-title"><i class="bi bi-plus-circle me-2"></i>Add New Book</h2>
+
+            <form asp-action="SaveAdd" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">📖 Title</label>
+                    <input asp-for="Title" class="form-control" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">✍️ Author</label>
+                    <input asp-for="Author" class="form-control" required />
+                    <span asp-validation-for="Author" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">💰 Price</label>
+                    <input asp-for="Price" type="number" step="0.01" class="form-control" required />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">📝 Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" required></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">📷 Upload Image</label>
+                    <input asp-for="Image" type="file" class="form-control" />
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">🏷️ Category</label>
+                    <select asp-for="CategoryId" class="form-select" required>
+                        <option value="">Select a Category</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+
+                    <button type="submit" class="btn btn-pink px-4">
+                        <i class="bi bi-check2-circle me-1"></i> Add Book
+                    </button>
+                    <a href="/Book/Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

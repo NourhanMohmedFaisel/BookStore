@@ -1,0 +1,126 @@
+﻿@model ReviewViewModelWithId
+
+@{
+    ViewData["Title"] = "Edit Review";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<div class="container my-5">
+    <div class="card border-0 shadow-lg rounded-4 p-4 bg-white">
+        <h2 class="fw-bold text-pink mb-4">
+            <i class="bi bi-pencil-fill me-2"></i> Edit Your Review
+        </h2>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="BookId" />
+
+          
+            <div class="mb-4">
+                <label class="form-label text-dark fw-semibold">
+                    <i class="bi bi-book-fill me-1 text-secondary"></i>Book Title
+                </label>
+                <div class="form-control bg-light border-0 fw-bold text-dark">
+                    @Model.BookTitle
+                </div>
+            </div>
+
+         
+            <div class="mb-4">
+                <label asp-for="Rating" class="form-label text-dark fw-semibold">Rating</label>
+                <div class="star-rating fs-4 text-warning d-flex gap-1">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi @(i <= Model.Rating ? "bi-star-fill" : "bi-star") star-icon"
+                           data-value="@i"
+                           style="cursor:pointer;"></i>
+                    }
+                </div>
+                <input type="hidden" asp-for="Rating" />
+                <span asp-validation-for="Rating" class="text-danger small"></span>
+            </div>
+
+           
+            <div class="mb-4">
+                <label asp-for="Comment" class="form-label text-dark fw-semibold">Comment</label>
+                <textarea asp-for="Comment" class="form-control shadow-sm" rows="5" placeholder="Update your thoughts..."></textarea>
+                <span asp-validation-for="Comment" class="text-danger small"></span>
+            </div>
+
+          
+            <div class="d-flex justify-content-end gap-3">
+                <a asp-controller="Book" asp-action="Details" asp-route-id="@Model.BookId"
+                   class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-pink rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-save me-1"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<style>
+    .text-pink {
+        color: #fd6d7b;
+    }
+
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff4e61;
+            color: white;
+        }
+
+    .star-icon {
+        color: #ffc107;
+        font-size: 1.8rem;
+        transition: color 0.2s ease-in-out;
+    }
+
+        .star-icon:hover {
+            color: #ffca2c;
+        }
+</style>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stars = document.querySelectorAll(".star-icon");
+            const ratingInput = document.querySelector("input[name='Rating']");
+
+            function updateStars(value) {
+                stars.forEach((star, index) => {
+                    if (index < value) {
+                        star.classList.remove("bi-star");
+                        star.classList.add("bi-star-fill");
+                    } else {
+                        star.classList.remove("bi-star-fill");
+                        star.classList.add("bi-star");
+                    }
+                });
+            }
+
+      
+            const current = parseInt(ratingInput.value || "0");
+            updateStars(current);
+
+            stars.forEach(star => {
+                star.addEventListener("click", function () {
+                    const value = parseInt(this.getAttribute("data-value"));
+                    ratingInput.value = value;
+                    updateStars(value);
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,172 @@
+﻿@model List<Book>
+@{
+    ViewData["Title"] = "Books Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as List<Category>;
+    var selectedCategoryId = Context.Request.Query["categoryId"];
+    var searchValue = Context.Request.Query["search"];
+}
+
+<style>
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+   
+
+    .btn-pink-outline {
+        border: 1px solid #fd6d7b;
+        color: #fd6d7b;
+        background-color: white;
+        transition: 0.3s ease-in-out;
+    }
+
+   
+    .btn-pink:hover {
+        background-color: #ff4e61;
+    }
+
+
+    .btn-reset {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+    .btn-reset:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+   
+
+    .badge-no-discount {
+        background-color: #f2f2f2;
+        color: #888;
+    }
+
+    .badge-category {
+        background-color: #e0f7fa;
+        color: #007b8a;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+        color: #333;
+    }
+
+    .fw-bold.text-primary {
+        color: #2b3e5f !important;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    
+
+</style>
+
+<div class="container mt-5">
+   
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="fw-bold" style="color: #fd6d7b;">
+            <i class="bi bi-book-half me-2" style="color: #fd6d7b;"></i>
+            Books Management
+        </h2>
+
+        <a asp-action="Add" class="btn btn-pink rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> Add Book
+        </a>
+    </div>
+
+    
+    <form class="row g-2 align-items-center mb-4" method="get" asp-action="Index">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" class="form-control" placeholder="Search by Title or Author..." value="@searchValue" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="categoryId">
+                <option value="">All Categories</option>
+                @foreach (var cat in categories)
+                {
+                    var isSelected = selectedCategoryId == cat.Id.ToString();
+                    <option value="@cat.Id" selected="@(isSelected ? "selected" : null)">@cat.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-pink btn-sm px-4 rounded-pill" type="submit">
+                <i class="bi bi-funnel-fill me-1"></i> Filter
+            </button>
+            <a href="@Url.Action("Index", "Book")" class="btn btn-reset btn-sm px-4 rounded-pill">
+                <i class="bi bi-x-circle me-1"></i> Reset
+            </a>
+        </div>
+    </form>
+
+    
+    <div class="table-responsive bg-white rounded shadow-sm p-3">
+        <table class="table table-hover text-center align-middle">
+            <thead class="table-light text-secondary fw-semibold">
+                <tr>
+                    <th>📚 Cover</th>
+                    <th>📖 Title</th>
+                    <th>✍️ Author</th>
+                    <th>🏷️ Category</th>
+                    <th>💲 Price</th>
+                    <th>🎁 Discount</th>
+                    <th>✅ Final Price</th>
+                    <th>⚙️ Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="~/images/@(book.ImagePath ?? "default-book.jpg")" alt="cover" width="50" class="rounded shadow-sm" />
+                        </td>
+                        <td class="fw-bold text-primary">@book.Title</td>
+                        <td>@book.Author</td>
+                        <td><span class="badge badge-category">@book.Category?.Name</span></td>
+                        <td>$@book.Price</td>
+                        <td>
+                            @if (book.Discount > 0)
+                            {
+                                <span class="badge bg-success rounded-pill">$@book.Discount</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-no-discount rounded-pill">No Discount</span>
+                            }
+                        </td>
+                        <td class="fw-bold text-success">$@(book.Price - book.Discount)</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                              
+                                <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-outline-warning btn-sm  rounded-pill">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                               
+                                <a asp-action="SetDiscount" asp-route-id="@book.Id" class="btn btn-outline-success btn-sm rounded-pill">
+                                    <i class="bi bi-percent"></i> Discount
+                                </a>
+                                
+                                <a asp-action="ConfirmDelete" asp-route-id="@book.Id" class="btn btn-outline-danger btn-sm rounded-pill">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

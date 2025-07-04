@@ -1,0 +1,143 @@
+﻿@model List<UserWithRolesViewModel>
+@using System.Security.Claims
+
+@{
+    var currentUserEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+    var superAdminEmail = "nourhan231@gmail.com"; 
+    ViewData["Title"] = "All Users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-pink fw-bold">👥 All Users</h2>
+
+   
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show custom-alert shadow-sm" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <strong>Note:</strong> @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show custom-alert shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>Success:</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+  
+    <div class="d-flex justify-content-end mb-4">
+        <a asp-controller="Account" asp-action="RegisterAdmin" class="btn btn-pink px-4 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-person-plus-fill me-2"></i> Add New Admin
+        </a>
+    </div>
+
+   
+    <table class="table table-bordered table-hover text-center shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role(s)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var userVm = Model[i];
+                var isAdmin = userVm.Roles.Contains("Admin");
+
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@userVm.User.UserName</td>
+                    <td>@userVm.User.Email</td>
+                    <td>
+                        @if (userVm.Roles.Any())
+                        {
+                            @foreach (var role in userVm.Roles)
+                            {
+                                <span class="badge bg-info text-dark me-1">@role</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No Role</span>
+                        }
+                    </td>
+                    <td>
+                        @if (isAdmin)
+                        {
+                            @if (currentUserEmail == superAdminEmail)
+                            {
+                                <a asp-action="RemoveAdmin" asp-route-id="@userVm.User.Id" class="btn btn-sm btn-danger rounded-pill">
+                                    Remove Admin
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="RemoveAdmin" asp-route-id="@userVm.User.Id" class="btn btn-sm btn-outline-danger rounded-pill">
+                                    Remove Admin
+                                </a>
+
+                            }
+                        }
+                        else
+                        {
+                            @if (currentUserEmail == superAdminEmail)
+                            {
+                                <a asp-action="MakeAdmin" asp-route-id="@userVm.User.Id" class="btn btn-sm btn-pink rounded-pill">
+                                    Make Admin
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="MakeAdmin" asp-route-id="@userVm.User.Id" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                    Make Admin
+                                </a>
+
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<style>
+    .text-pink {
+        color: #fd6d7b;
+    }
+
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff4e61;
+        }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    .custom-alert {
+        border-left: 6px solid #fd6d7b;
+        background-color: #fff4f6;
+        color: #5c2b33;
+        font-weight: 500;
+        padding: 1rem;
+        border-radius: 0.6rem;
+        margin-bottom: 1rem;
+    }
+</style>

@@ -1,0 +1,62 @@
+﻿@model ReviewViewModel
+
+@{
+    ViewData["Title"] = "Add Review";
+   
+}
+
+<div class="container my-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <h3 class="mb-4 text-pink"><i class="bi bi-star-fill me-2"></i> Add Review</h3>
+
+        <form asp-action="Add" asp-controller="Review" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="BookId" />
+
+            <div class="mb-3">
+                <label asp-for="Rating" class="form-label"></label>
+                <select asp-for="Rating" class="form-select">
+                    <option value="">Select Rating</option>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Comment" class="form-label"></label>
+                <textarea asp-for="Comment" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-pink px-4 rounded-pill shadow-sm">
+                <i class="bi bi-check-circle me-1"></i> Submit Review
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .text-pink {
+        color: #fd6d7b;
+    }
+
+    .btn-pink {
+        background-color: #fd6d7b;
+        color: white;
+        border: none;
+    }
+
+        .btn-pink:hover {
+            background-color: #ff4e61;
+            color: white;
+        }
+</style>
