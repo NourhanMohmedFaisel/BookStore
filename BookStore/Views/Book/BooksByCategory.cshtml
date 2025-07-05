@@ -1,18 +1,18 @@
-﻿@model List<Book>
+@model List<Book>
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @inject BookStore.IRepository.IWishlistRepo _wishlistRepo
 @using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Search Results";
+    ViewData["Title"] = "Books In Category";
     var userId = User.Identity.IsAuthenticated ? int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) : 0;
     var wishlist = userId != 0 ? _wishlistRepo.GetWishlistByUserId(userId) : null;
     var bookIdsInWishlist = wishlist?.WishlistItems.Select(w => w.BookId).ToHashSet() ?? new HashSet<int>();
 
   
 }
-
+<input type="hidden" id="__RequestVerificationToken" name="__RequestVerificationToken" value="@Xsrf.GetAndStoreTokens(Context).RequestToken" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
@@ -329,9 +329,8 @@
 
             const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
 
-            document.querySelectorAll(".cart-toggle-btn").forEach(button => {
+           document.querySelectorAll(".cart-toggle-btn").forEach(button => {
                 button.addEventListener("click", function () {
-
                     if (!isAuthenticated) {
                         loginWarningModal.show();
                         return;
@@ -339,25 +338,27 @@
 
                     const bookId = this.getAttribute("data-book-id");
 
+                    const formData = new URLSearchParams();
+                    formData.append("bookId", bookId);
+                    formData.append("__RequestVerificationToken", document.getElementById('__RequestVerificationToken').value); 
+
                     fetch('/CartItem/Add', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: JSON.stringify(bookId)
+                        body: formData
                     })
-                        .then(response => {
-                            if (response.ok) {
-                                cartModal.show();
-                            } else {
-                                alert("Error adding to cart");
-                            }
-                        });
+                    .then(response => {
+                        if (response.ok) {
+                            cartModal.show();
+                        } else {
+                            alert("Error adding to cart");
+                        }
+                    });
                 });
             });
         });
-
 
     </script>
 }
